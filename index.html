@@ -1,0 +1,356 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Calendar UI Enhanced Final</title>
+<style>
+    body {
+  margin: 0;
+
+      font-family: sans-serif;
+      background: transparent;
+      padding: 30px;
+    }
+    .calendar-wrapper {
+  border-radius: 16px;
+
+  max-width: 100%;
+  width: 95%;
+
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      width: 800px;
+      margin: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    }
+    .calendar-header-box {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .calendar-controls {
+      display: flex;
+      align-items: center;
+      background: #f9fafb;
+      border-radius: 12px;
+      padding: 6px 12px;
+      gap: 8px;
+    }
+    .calendar-controls button {
+  font-size: 14px;
+      border: none;
+      background: white;
+      padding: 6px 10px;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .calendar-controls .today-btn {
+      background: #eef2ff;
+      color: #4f46e5;
+      font-weight: 500;
+    }
+    .calendar-controls .month-label {
+  font-size: 14px;
+      margin-left: 10px;
+      font-weight: 600;
+      min-width: 120px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+    th, td {
+      width: 14.28%;
+      text-align: left;
+      vertical-align: top;
+      border: 1px solid #e5e7eb;
+      padding: 8px;
+    }
+    th {
+      background: #f9fafb;
+    }
+    td.sun, th.sun {
+      background: #f9fafb !important;
+      color: #555;
+    }
+    td.sat, th.sat {
+      background: #f9fafb !important;
+      color: #555;
+    }
+    td {
+      background: white;
+      height: 80px;
+    }
+    td .event {
+      margin-top: 6px;
+      background: linear-gradient(90deg, #35d1b1, #5679dc);
+      color: white;
+      font-size: 12px;
+      padding: 3px 6px;
+      border-radius: 6px;
+      display: inline-block;
+    }
+    .event-list {
+      margin-top: 30px;
+    }
+    .event-list h3 {
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+    .event-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+      background: #f9fafb;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+  
+@media (max-width: 768px) {
+  .calendar-wrapper {
+  border-radius: 16px;
+
+    padding: 12px;
+  }
+  .calendar-controls button,
+  .calendar-controls .month-label {
+    font-size: 12px;
+  }
+  th, td {
+    padding: 4px;
+    font-size: 12px;
+  }
+  .event-item {
+    font-size: 12px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+td:hover {
+  background: #f3f4f6 !important;
+}
+
+td.sun:empty {
+  background: #f9fafb !important;
+}
+td.sat:empty {
+  background: #f9fafb !important;
+}
+
+.gradient-text {
+  background: linear-gradient(90deg, #35d1b1, #5679dc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: bold;
+}
+.calendar-controls .today-btn {
+  background: #eef2ff;
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .ency-logo { display: none; }
+  .ency-text::before {
+    content: 'ENCY KOREA ';
+    font-weight: bold;
+  }
+}
+</style>
+</head>
+<body>
+<div class="calendar-wrapper">
+<div class="calendar-header-box">
+<div style="display: flex; align-items: center; gap: 8px; font-size: 20px; font-weight: bold;">
+<span class="ency-logo">
+<img alt="ENCY" src="https://contents.sixshop.com/uploadedFiles/243939/default/image_1742175319450.png" style="height: auto; width: auto; max-height: 20px;"/>
+</span>
+<span class="ency-text">정기교육 일정</span>
+</div>
+<div class="calendar-controls">
+<button class="today-btn" onclick="goToday()">Today</button>
+<button onclick="changeMonth(-1)">‹</button>
+<button onclick="changeMonth(1)">›</button>
+<div class="month-label" id="month-title">June 2025</div>
+</div>
+</div>
+<table>
+<thead>
+<tr>
+<th class="sun">Sun</th><th class="">Mon</th><th class="">Tue</th><th class="">Wed</th><th class="">Thu</th><th class="">Fri</th><th class="sat">Sat</th>
+</tr>
+</thead>
+<tbody id="calendar-body"></tbody>
+</table>
+<div class="event-list">
+<h3>📆 Education Schedule</h3>
+<div id="event-items"></div>
+</div>
+</div>
+<script>
+const calendarData = {
+  "2025-06": [
+  ["1", "2", "3", "4", "5", "6", "7"],
+  ["8", "9", "10:[서울] 초급 (2D~2.5D 가공)", "11:[서울] 초급 (2D~2.5D 가공)", "12", "13", "14"],
+  ["15", "16", "17", "18", "19:[서울] 중급 (3~5축 가공)", "20:[서울] 중급 (3~5축 가공)", "21"],
+  ["22", "23", "24", "25", "26", "27", "28"],
+  ["29", "30", "", "", "", "", ""]
+],
+  "2025-07": [
+  ["", "", "1", "2", "3", "4", "5"],
+  ["6", "7", "8", "9", "10", "11", "12"],
+  ["13", "14:[서울] 초급 (2D~2.5D 가공)", "15:[서울] 초급 (2D~2.5D 가공)", "16:[서울] 중급 (3~5축 가공)", "17:[서울] 중급 (3~5축 가공)", "18:[서울] 선반 (2축)", "19"],
+  ["20", "21", "22", "23", "24", "25", "26"],
+  ["27", "28", "29", "30", "31", "", ""]
+],
+  "2025-08": [
+  ["", "", "", "", "", "1", "2"],
+  ["3", "4", "5", "6", "7", "8", "9"],
+  ["10", "11:[창원] 초급 (2D~2.5D 가공)", "12:[창원] 초급 (2D~2.5D 가공)", "13:[서울] 중급 (3~5축 가공)", "14:[서울] 중급 (3~5축 가공)", "15:[서울] 선반 (2축)", "16"],
+  ["17", "18", "19", "20", "21", "22", "23"],
+  ["24", "25", "26", "27", "28", "29", "30"],
+  ["31", "", "", "", "", "", ""]
+],
+  "2025-09": [
+  ["", "1", "2", "3", "4", "5", "6"],
+  ["7", "8", "9", "10", "11", "12", "13"],
+  ["14", "15", "16", "17", "18", "19", "20"],
+  ["21", "22", "23", "24", "25", "26", "27"],
+  ["28", "29", "30", "", "", "", ""]
+],
+  "2025-10": [
+  ["", "", "", "1", "2", "3", "4"],
+  ["5", "6", "7", "8", "9", "10", "11"],
+  ["12", "13", "14", "15", "16", "17", "18"],
+  ["19", "20", "21", "22", "23", "24", "25"],
+  ["26", "27", "28", "29", "30", "31", ""]
+],
+  "2025-11": [
+  ["", "", "", "", "", "", "1"],
+  ["2", "3", "4", "5", "6", "7", "8"],
+  ["9", "10", "11", "12", "13", "14", "15"],
+  ["16", "17", "18", "19", "20", "21", "22"],
+  ["23", "24", "25", "26", "27", "28", "29"],
+  ["30", "", "", "", "", "", ""]
+],
+  "2025-12": [
+  ["", "1", "2", "3", "4", "5", "6"],
+  ["7", "8", "9", "10", "11", "12", "13"],
+  ["14", "15", "16", "17", "18", "19", "20"],
+  ["21", "22", "23", "24", "25", "26", "27"],
+  ["28", "29", "30", "31", "", "", ""]
+],
+};
+
+const eventMap = {
+  "2025-06": [
+    { name: "[서울] 초급 (2D~2.5D 가공)", date: "June 10, 2025, 10AM – 5PM" },
+    { name: "[서울] 초급 (2D~2.5D 가공)", date: "June 11, 2025, 10AM – 5PM" },
+    { name: "[서울] 중급 (3~5축 가공)", date: "June 19, 2025, 10AM – 5PM" },
+    { name: "[서울] 중급 (3~5축 가공)", date: "June 20, 2025, 10AM – 5PM" },
+  ],
+  "2025-07": [
+    { name: "[서울] 초급 (2D~2.5D 가공)", date: "July 14, 2025, 10AM – 5PM" },
+    { name: "[서울] 초급 (2D~2.5D 가공)", date: "July 15, 2025, 10AM – 5PM" },
+    { name: "[서울] 중급 (3~5축 가공)", date: "July 16, 2025, 10AM – 5PM" },
+    { name: "[서울] 중급 (3~5축 가공)", date: "July 17, 2025, 10AM – 5PM" },
+    { name: "[서울] 선반 (2축)", date: "July 18, 2025, 10AM – 5PM" },
+  ],
+  "2025-08": [
+    { name: "[창원] 초급 (2D~2.5D 가공)", date: "August 11, 2025, 10AM – 5PM" },
+    { name: "[창원] 초급 (2D~2.5D 가공)", date: "August 12, 2025, 10AM – 5PM" },
+    { name: "[서울] 중급 (3~5축 가공)", date: "August 13, 2025, 10AM – 5PM" },
+    { name: "[서울] 중급 (3~5축 가공)", date: "August 14, 2025, 10AM – 5PM" },
+    { name: "[서울] 선반 (2축)", date: "August 15, 2025, 10AM – 5PM" },
+  ],
+};
+
+const monthList = Object.keys(calendarData);
+let currentIndex = 0;
+
+function renderCalendar(monthKey) {
+  const tbody = document.getElementById("calendar-body");
+  tbody.innerHTML = "";
+
+  const [year, month] = monthKey.split("-");
+  document.getElementById("month-title").textContent = `${year}년 ${parseInt(month)}월`;
+
+  const monthData = calendarData[monthKey] || [];
+  for (const row of monthData) {
+    const tr = document.createElement("tr");
+    for (let i = 0; i < 7; i++) {
+      const td = document.createElement("td");
+      const cell = row[i];
+      if (!cell) {
+        td.innerHTML = "";
+        tr.appendChild(td);
+        continue;
+      }
+
+      const [day, evt] = cell.split(":");
+      td.innerHTML = `<div>${day}</div>`;
+      if (evt) {
+        const div = document.createElement("div");
+        div.className = "event";
+        div.textContent = evt;
+        if (evt) {
+        const div = document.createElement("div");
+        div.className = "event";
+        div.textContent = evt;
+        td.appendChild(div);
+        td.style.cursor = "pointer";
+        td.onclick = () => window.open("https://wkf.ms/40mGiEF", "_blank");
+      }
+      }
+
+      if (i === 0) td.classList.add("sun");
+      if (i === 6) td.classList.add("sat");
+      tr.appendChild(td);
+    }
+    tbody.appendChild(tr);
+  }
+
+  // 이벤트 영역 업데이트
+  const eventBox = document.getElementById("event-items");
+  eventBox.innerHTML = "";
+  const events = eventMap[monthKey] || [];
+  events.forEach(e => {
+    const div = document.createElement("div");
+    div.className = "event-item";
+    div.innerHTML = `
+      <div style="width:10px;height:10px;border-radius:50%;background:linear-gradient(90deg,#35d1b1,#5679dc);flex-shrink:0;"></div>
+      <div><strong>${e.name}</strong><br>${e.date}</div>
+    `;
+    eventBox.appendChild(div);
+  });
+}
+
+function changeMonth(offset) {
+  currentIndex += offset;
+  if (currentIndex < 0) currentIndex = 0;
+  if (currentIndex >= monthList.length) currentIndex = monthList.length - 1;
+  renderCalendar(monthList[currentIndex]);
+}
+
+function goToday() {
+  currentIndex = 0;
+  renderCalendar(monthList[currentIndex]);
+}
+
+window.onload = () => renderCalendar(monthList[currentIndex]);
+
+// Apply background for empty sun/sat cells
+document.querySelectorAll("td.sun:empty, td.sat:empty").forEach(td => {
+  td.style.background = "#f9fafb";
+});
+</script>
+</body>
+</html>
